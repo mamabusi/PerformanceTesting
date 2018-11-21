@@ -1,8 +1,18 @@
 import Vapor
 
+#if os(Linux)
+    import SwiftGlibc
+
+    public func arc4random_uniform(_ max: UInt32) -> Int32 {
+        return (SwiftGlibc.rand() % Int32(max-1)) + 1
+    }
+#endif
+
+
+
 /// Register your application's routes here.
 public func routes(_ router: Router) throws {
-    // Basic "Hello, world!" example
+    
     router.get("hello") { req in
         return "Hello, world!"
     }
@@ -12,12 +22,10 @@ public func routes(_ router: Router) throws {
 
     let plainTextController = PlainTextController()
     router.get("plaintext", use: plainTextController.get)
-
-    // Example of configuring a controller
-    let todoController = TodoController()
-    router.get("todos", use: todoController.index)
-    router.post("todos", use: todoController.create)
-    router.delete("todos", Todo.parameter, use: todoController.delete)
+    
+    let blogController = BlogController()
+    router.get("blog", use: blogController.get) 
+    router.get("blogJSON", use: blogController.json)
 
     router.get("/") { req in
         return try req.view().render("StaticFile.html")
@@ -28,5 +36,6 @@ public func routes(_ router: Router) throws {
         logger.info("Hello, World!")
         return "Hello, world!" 
     }
-
 }
+
+
